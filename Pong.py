@@ -11,6 +11,7 @@ screen = pygame.display.set_mode((TEMP_SCREEN_WIDTH, TEMP_SCREEN_HEIGHT), flags 
 pygame.display.set_caption(NAME)
 
 NUMBERFONT = pygame.font.Font("ataris-pong-score.otf", 40)
+COUNTDOWNFONT = pygame.font.Font("ataris-pong-score.otf", 100)
 TEXTFONT = pygame.font.SysFont("Georgia", 40)
 
 #Colours
@@ -112,8 +113,8 @@ def ballCollision():
     global ball_x_speed
     if ball.colliderect(player1):
         ball_x_speed *= -1
-        #distance = (ball.left - player1.right)
-        ball.x += 5
+        distance = (ball.left - player1.right)
+        ball.x -= distance
 
     if ball.colliderect(player2):
         ball_x_speed *= -1
@@ -213,16 +214,32 @@ def mainMenu():
                 run = False
         
         pygame.display.update()
-    
-    
-
 
 def playButton():
-    global SCREEN_BOTTOM, PADDLE_MOVE_SPEED
+    global SCREEN_BOTTOM, PADDLE_MOVE_SPEED, player1Y, player2Y
     TPS = 100
     delay = int(1000 / TPS)
-
+    ball.center = screen.get_width()//2, screen.get_height()//2
+    player1Y = screen.get_height()/2 - 50
+    player2Y = screen.get_height()/2 - 50
     run = True
+
+    countdown = 3
+    while countdown != 0:
+        screen.fill(BLACK)
+        drawPaddles()
+        drawBall()
+        drawCentreLine()
+        displayScore()
+
+        StartCountdown = COUNTDOWNFONT.render(str(countdown), True, WHITE)
+        screen.blit(StartCountdown, (screen.get_width()/2 - 25, 100))
+        
+        pygame.display.update()
+        countdown -= 1
+        pygame.time.delay(1000)
+
+
     while run:
         
         pygame.time.delay(delay)
