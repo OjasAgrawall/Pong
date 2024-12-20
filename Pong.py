@@ -93,18 +93,18 @@ def ballMovement():
 
 def relativeBallSpeed():
     global ball_x_speed, ball_y_speed
-    ball_speed_scale = 200
+    ball_speed_scale = 175
     if ball_x_speed < 0:
-        ball_x_speed = -(screen.get_width() // ball_speed_scale)
+        ball_x_speed = -(screen.get_width() / ball_speed_scale)
 
     if ball_x_speed > 0:
-        ball_x_speed = screen.get_width() // ball_speed_scale
+        ball_x_speed = screen.get_width() / ball_speed_scale 
 
     if ball_y_speed < 0:
-        ball_y_speed = -(screen.get_height() // ball_speed_scale)
+        ball_y_speed = -(screen.get_height() / ball_speed_scale) * 1.5
 
     if ball_y_speed > 0:
-        ball_y_speed = screen.get_height() // ball_speed_scale
+        ball_y_speed = screen.get_height() / ball_speed_scale * 1.5
 
 def ballCollision():
     global ball_x_speed
@@ -143,7 +143,7 @@ while run:
 
     # Get the bottom of the screen using the changing screen height
     SCREEN_BOTTOM = screen.get_height() - 100
-    PADDLE_MOVE_SPEED = screen.get_height() // 200
+    PADDLE_MOVE_SPEED = screen.get_height() / 150
 
     relativeBallSpeed()
     
