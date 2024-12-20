@@ -1,4 +1,5 @@
 import pygame
+import math
 
 pygame.init()
 
@@ -110,9 +111,13 @@ def ballCollision():
     global ball_x_speed
     if ball.colliderect(player1):
         ball_x_speed *= -1
+        distance = (ball.left - player1.right)
+        ball.x -= distance
 
     if ball.colliderect(player2):
         ball_x_speed *= -1
+        distance = (ball.right - player2.left)
+        ball.x -= distance
         
 def drawBall():
     pygame.draw.circle(screen, WHITE, ball.center, BALL_RADIUS) 
