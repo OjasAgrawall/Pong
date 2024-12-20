@@ -15,15 +15,15 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 #Paddles
-PADDLE_WIDTH = 50
+PADDLE_WIDTH = 35
 PADDLE_HEIGHT = 100
 
-
 player1Y = 0
-
+player1Score = 0
     
 player2X = screen.get_width() - 100
 player2Y = 0
+player2Score = 0
 
 def paddleMovement():
     global player1Y, player2Y
@@ -59,12 +59,38 @@ def drawPaddles():
     pygame.draw.rect(screen, WHITE, player1)
     pygame.draw.rect(screen, WHITE, player2)
 
+#ball
+BALL_RADIUS = 10
+ball = pygame.Rect(screen.get_width()//2 - BALL_RADIUS, screen.get_height()//2 - BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2)
+ball_x_speed = 2
+ball_y_speed = 2
+
+def ballMovement():
+    global ball_x_speed, ball_y_speed, player2Score, player1Score
+    ball.x += ball_x_speed
+    ball.y += ball_y_speed
+
+    if (ball.y + 2*BALL_RADIUS) >= screen.get_height() or ball.y <= 0:
+        ball_y_speed *= -1
+
+    if (ball.x + 2*BALL_RADIUS) >= screen.get_width():
+        player1Score += 1
+        ball.center = screen.get_width()//2, screen.get_height()//2
+        ball_x_speed *= -1
+
+    if ball.x <= 0:
+        player2Score += 1
+        ball.center = screen.get_width()//2, screen.get_height()//2
+        ball_x_speed *= -1
+        
+def drawBall():
+    pygame.draw.circle(screen, WHITE, ball.center, BALL_RADIUS)
+
 def drawCentreLine():
     SCREEN_MID = screen.get_width() / 2
     SCREEN_HEIGHT = screen.get_height()
     for y in range(0, SCREEN_HEIGHT, SCREEN_HEIGHT // 10):
         pygame.draw.rect(screen, WHITE, (SCREEN_MID - 2, y + 20, 4, (SCREEN_HEIGHT//20)))
-
 
 TPS = 100
 delay = int(1000 / TPS)
@@ -81,11 +107,15 @@ while run:
     SCREEN_BOTTOM = screen.get_height() - 100
     PADDLE_MOVE_SPEED = (screen.get_height()) / 200
 
-    # The two player paddle movements
+    # movements
     paddleMovement()
+    ballMovement()
 
-    #actually draw the paddles onto the screen
+
+    #actually draw onto the screen
     drawPaddles()
+    drawBall()
+
 
     drawCentreLine()
 
