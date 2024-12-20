@@ -9,6 +9,7 @@ NAME = "Pong"
 screen = pygame.display.set_mode((TEMP_SCREEN_WIDTH, TEMP_SCREEN_HEIGHT), flags = pygame.RESIZABLE)
 pygame.display.set_caption(NAME)
 
+FONT = pygame.font.SysFont("Consolas", screen.get_width()//20)
 
 #Colours
 BLACK = (0, 0, 0)
@@ -18,12 +19,16 @@ WHITE = (255, 255, 255)
 PADDLE_WIDTH = 35
 PADDLE_HEIGHT = 100
 
+
 player1Y = 0
 player1Score = 0
-    
+player1 = pygame.Rect((50, player1Y, PADDLE_WIDTH, PADDLE_HEIGHT))
+
 player2X = screen.get_width() - 100
 player2Y = 0
 player2Score = 0
+player2 = pygame.Rect((player2X, player2Y, PADDLE_WIDTH, PADDLE_HEIGHT))
+
 
 def paddleMovement():
     global player1Y, player2Y
@@ -50,20 +55,21 @@ def paddleMovement():
     if player2Y > SCREEN_BOTTOM:
             player2Y = SCREEN_BOTTOM
 
+
 def drawPaddles():
+    global player1, player2
     player1 = pygame.Rect((50, player1Y, PADDLE_WIDTH, PADDLE_HEIGHT))
 
     player2X = screen.get_width() - 100
     player2 = pygame.Rect((player2X, player2Y, PADDLE_WIDTH, PADDLE_HEIGHT))
-
     pygame.draw.rect(screen, WHITE, player1)
     pygame.draw.rect(screen, WHITE, player2)
 
 #ball
 BALL_RADIUS = 10
 ball = pygame.Rect(screen.get_width()//2 - BALL_RADIUS, screen.get_height()//2 - BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2)
-ball_x_speed = 2
-ball_y_speed = 2
+ball_x_speed = 4
+ball_y_speed = 4
 
 def ballMovement():
     global ball_x_speed, ball_y_speed, player2Score, player1Score
@@ -77,20 +83,52 @@ def ballMovement():
         player1Score += 1
         ball.center = screen.get_width()//2, screen.get_height()//2
         ball_x_speed *= -1
+        ball_y_speed *= -1
 
     if ball.x <= 0:
         player2Score += 1
         ball.center = screen.get_width()//2, screen.get_height()//2
         ball_x_speed *= -1
+        ball_y_speed *= -1
+
+def relativeBallSpeed():
+    global ball_x_speed, ball_y_speed
+    ball_speed_scale = 200
+    if ball_x_speed < 0:
+        ball_x_speed = -(screen.get_width() // ball_speed_scale)
+
+    if ball_x_speed > 0:
+        ball_x_speed = screen.get_width() // ball_speed_scale
+
+    if ball_y_speed < 0:
+        ball_y_speed = -(screen.get_height() // ball_speed_scale)
+
+    if ball_y_speed > 0:
+        ball_y_speed = screen.get_height() // ball_speed_scale
+
+def ballCollision():
+    global ball_x_speed
+    if ball.colliderect(player1):
+        ball_x_speed *= -1
+
+    if ball.colliderect(player2):
+        ball_x_speed *= -1
         
 def drawBall():
-    pygame.draw.circle(screen, WHITE, ball.center, BALL_RADIUS)
+    pygame.draw.circle(screen, WHITE, ball.center, BALL_RADIUS) 
 
 def drawCentreLine():
     SCREEN_MID = screen.get_width() / 2
     SCREEN_HEIGHT = screen.get_height()
     for y in range(0, SCREEN_HEIGHT, SCREEN_HEIGHT // 10):
         pygame.draw.rect(screen, WHITE, (SCREEN_MID - 2, y + 20, 4, (SCREEN_HEIGHT//20)))
+
+def displayScore():
+    player1_score_text = FONT.render(str(player1Score), True, WHITE)
+    player2_score_text = FONT.render(str(player2Score), True, WHITE)
+
+    screen.blit(player1_score_text, (screen.get_width()/2 - (screen.get_width()//20) - 10, 50))
+    screen.blit(player2_score_text, (screen.get_width()/2 + (screen.get_width()//20) - 10, 50))
 
 TPS = 100
 delay = int(1000 / TPS)
@@ -105,19 +143,26 @@ while run:
 
     # Get the bottom of the screen using the changing screen height
     SCREEN_BOTTOM = screen.get_height() - 100
-    PADDLE_MOVE_SPEED = (screen.get_height()) / 200
+    PADDLE_MOVE_SPEED = screen.get_height() // 200
+
+    relativeBallSpeed()
+    
 
     # movements
     paddleMovement()
     ballMovement()
+    
+    #collisions checks
+    ballCollision()
 
 
     #actually draw onto the screen
     drawPaddles()
     drawBall()
-
-
     drawCentreLine()
+
+    #Score
+    displayScore()
 
     #if you want to leave you can
     for event in pygame.event.get():
