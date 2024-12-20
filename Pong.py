@@ -5,6 +5,7 @@ pygame.init()
 TEMP_SCREEN_WIDTH = 800
 TEMP_SCREEN_HEIGHT = 600
 NAME = "Pong"
+bg = pygame.image.load("PongBackground.jpg")
 
 screen = pygame.display.set_mode((TEMP_SCREEN_WIDTH, TEMP_SCREEN_HEIGHT), flags = pygame.RESIZABLE)
 pygame.display.set_caption(NAME)
@@ -163,34 +164,28 @@ class Button():
         self.rounding = n
 
     def draw(self):
-        
-
         pygame.draw.rect(screen, self.color, self.button_rect, 0, self.rounding)
         pygame.draw.rect(screen, BLACK, self.button_rect, 2, self.rounding)
 
         screen.blit(self.button_text, (self.textX, self.textY))
-    
-    def clicked(self):
-        global run
-        mouse_pos = pygame.mouse.get_pos()
-
-        key = pygame.key.get_pressed()
-        if key[pygame.MOUSEBUTTONDOWN] and self.button_rect.collidepoint(mouse_pos):
-            run = False
         
-
 def mainMenu():
     run = True
-    global playButtonPressed
+    global playButtonPressed, bg
     playButtonPressed = False
     while run:
+
         screen.fill(WHITE)
+
+        bg = pygame.transform.scale(bg, (screen.get_width(), screen.get_height()))
+        screen.blit(bg, (0,0))
 
         play_button = Button("Play", (screen.get_width()/2) - 100, (screen.get_height() - 300), 200, 80)
         play_button.textX = play_button.x + 58
         play_button.textY = play_button.y + 15
 
         play_button.setRounding(20)
+        play_button.setColor(211,211,211)
         play_button.draw()
 
         exit_button = Button("Exit", (screen.get_width()/2) - 100, (screen.get_height() - 100), 200, 80)
@@ -198,10 +193,17 @@ def mainMenu():
         exit_button.textY = exit_button.y + 15
 
         exit_button.setRounding(20)
+        exit_button.setColor(211,211,211)
         exit_button.draw()
 
-        play_button.clicked()
-        exit_button.clicked()
+        mouse_pos = pygame.mouse.get_pos()
+
+        if pygame.mouse.get_pressed()[0]:
+            if play_button.button_rect.collidepoint(mouse_pos):
+                playButtonPressed = True
+
+            if exit_button.button_rect.collidepoint(mouse_pos):
+                run = False
 
         if playButtonPressed:
             run = False
