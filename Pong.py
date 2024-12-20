@@ -1,5 +1,4 @@
 import pygame
-import math
 
 pygame.init()
 
@@ -10,7 +9,8 @@ NAME = "Pong"
 screen = pygame.display.set_mode((TEMP_SCREEN_WIDTH, TEMP_SCREEN_HEIGHT), flags = pygame.RESIZABLE)
 pygame.display.set_caption(NAME)
 
-FONT = pygame.font.SysFont("Consolas", screen.get_width()//20)
+NUMBERFONT = pygame.font.Font("ataris-pong-score.otf", 40)
+TEXTFONT = pygame.font.SysFont("Georgia", 40)
 
 #Colours
 BLACK = (0, 0, 0)
@@ -111,8 +111,8 @@ def ballCollision():
     global ball_x_speed
     if ball.colliderect(player1):
         ball_x_speed *= -1
-        distance = (ball.left - player1.right)
-        ball.x -= distance
+        #distance = (ball.left - player1.right)
+        ball.x += 5
 
     if ball.colliderect(player2):
         ball_x_speed *= -1
@@ -129,51 +129,137 @@ def drawCentreLine():
         pygame.draw.rect(screen, WHITE, (SCREEN_MID - 2, y + 20, 4, (SCREEN_HEIGHT//20)))
 
 def displayScore():
-    player1_score_text = FONT.render(str(player1Score), True, WHITE)
-    player2_score_text = FONT.render(str(player2Score), True, WHITE)
+    player1_score_text = NUMBERFONT.render(str(player1Score), True, WHITE)
+    player2_score_text = NUMBERFONT.render(str(player2Score), True, WHITE)
 
     screen.blit(player1_score_text, (screen.get_width()/2 - (screen.get_width()//20) - 10, 50))
     screen.blit(player2_score_text, (screen.get_width()/2 + (screen.get_width()//20) - 10, 50))
-
-TPS = 100
-delay = int(1000 / TPS)
-
 run = True
-while run:
+class Button():
+    def __init__(self, text, x, y, width, height):
+        self.text = text
+        self.x = x
+        self.y = y
+        self.textX = x
+        self.textY = y
+        self.width = width
+        self.height = height
+        self.color = WHITE
+        self.rounding = 0
+        self.text_color = BLACK
+
+        button_text = TEXTFONT.render(self.text, True, self.text_color)
+        self.button_text = button_text
+        button_rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.button_rect = button_rect
     
-    pygame.time.delay(delay)
+    def setColor(self, r, g, b):
+        self.color = (r, g, b)
     
-    #reset screen 
-    screen.fill((0, 0, 0))
-
-    # Get the bottom of the screen using the changing screen height
-    SCREEN_BOTTOM = screen.get_height() - 100
-    PADDLE_MOVE_SPEED = screen.get_height() / 150
-
-    relativeBallSpeed()
+    def setTextColor(self, r, g, b):
+        self.text_color = (r, g, b)
     
+    def setRounding(self, n):
+        self.rounding = n
 
-    # movements
-    paddleMovement()
-    ballMovement()
+    def draw(self):
+        
+
+        pygame.draw.rect(screen, self.color, self.button_rect, 0, self.rounding)
+        pygame.draw.rect(screen, BLACK, self.button_rect, 2, self.rounding)
+
+        screen.blit(self.button_text, (self.textX, self.textY))
     
-    #collisions checks
-    ballCollision()
+    def clicked(self):
+        global run
+        mouse_pos = pygame.mouse.get_pos()
 
-
-    #actually draw onto the screen
-    drawPaddles()
-    drawBall()
-    drawCentreLine()
-
-    #Score
-    displayScore()
-
-    #if you want to leave you can
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        key = pygame.key.get_pressed()
+        if key[pygame.MOUSEBUTTONDOWN] and self.button_rect.collidepoint(mouse_pos):
             run = False
+        
+
+def mainMenu():
+    run = True
+    global playButtonPressed
+    playButtonPressed = False
+    while run:
+        screen.fill(WHITE)
+
+        play_button = Button("Play", (screen.get_width()/2) - 100, (screen.get_height() - 300), 200, 80)
+        play_button.textX = play_button.x + 58
+        play_button.textY = play_button.y + 15
+
+        play_button.setRounding(20)
+        play_button.draw()
+
+        exit_button = Button("Exit", (screen.get_width()/2) - 100, (screen.get_height() - 100), 200, 80)
+        exit_button.textX = exit_button.x + 58
+        exit_button.textY = exit_button.y + 15
+
+        exit_button.setRounding(20)
+        exit_button.draw()
+
+        play_button.clicked()
+        exit_button.clicked()
+
+        if playButtonPressed:
+            run = False
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        
+        pygame.display.update()
     
-    pygame.display.update()
+    
+
+
+def playButton():
+    global SCREEN_BOTTOM, PADDLE_MOVE_SPEED
+    TPS = 100
+    delay = int(1000 / TPS)
+
+    run = True
+    while run:
+        
+        pygame.time.delay(delay)
+        
+        #reset screen 
+        screen.fill(BLACK)
+
+        # Get the bottom of the screen using the changing screen height
+        SCREEN_BOTTOM = screen.get_height() - 100
+        PADDLE_MOVE_SPEED = screen.get_height() / 150
+
+        relativeBallSpeed()
+        
+
+        # movements
+        paddleMovement()
+        ballMovement()
+        
+        #collisions checks
+        ballCollision()
+
+
+        #actually draw onto the screen
+        drawPaddles()
+        drawBall()
+        drawCentreLine()
+
+        #Score
+        displayScore()
+
+        #if you want to leave you can
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        
+        pygame.display.update()
+
+mainMenu()
+if playButtonPressed:
+    playButton()
 
 pygame.quit()
