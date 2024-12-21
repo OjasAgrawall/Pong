@@ -178,6 +178,12 @@ class Button():
         pygame.draw.rect(screen, BLACK, self.button_rect, 2, self.rounding)
 
         screen.blit(self.button_text, (self.textX, self.textY))
+    
+    def clicked(self):
+        mouse_pos = pygame.mouse.get_pos()
+        if pygame.mouse.get_pressed()[0]:
+            if self.button_rect.collidepoint(mouse_pos):
+                return True
         
 def mainMenu():
     run = True
@@ -206,14 +212,10 @@ def mainMenu():
         exit_button.setColor(211,211,211)
         exit_button.draw()
 
-        mouse_pos = pygame.mouse.get_pos()
-
-        if pygame.mouse.get_pressed()[0]:
-            if play_button.button_rect.collidepoint(mouse_pos):
-                playButtonPressed = True
-
-            if exit_button.button_rect.collidepoint(mouse_pos):
-                run = False
+        if play_button.clicked():
+            playButtonPressed = True
+        if exit_button.clicked():
+            run = False
 
         if playButtonPressed:
             run = False
