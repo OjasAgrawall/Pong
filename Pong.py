@@ -1,6 +1,11 @@
 import pygame
 
 pygame.init()
+pygame.mixer.init()
+
+ball_bounce = pygame.mixer.Sound("18786.mp3")
+background_music = pygame.mixer.Sound("BackgroundMusic.mp3")
+
 
 TEMP_SCREEN_WIDTH = 800
 TEMP_SCREEN_HEIGHT = 600
@@ -112,11 +117,15 @@ def relativeBallSpeed():
 def ballCollision():
     global ball_x_speed
     if ball.colliderect(player1):
+        ball_bounce.play()
         ball_x_speed *= -1
         distance = (ball.left - player1.right)
         ball.x -= distance
+                
+
 
     if ball.colliderect(player2):
+        ball_bounce.play()
         ball_x_speed *= -1
         distance = (ball.right - player2.left)
         ball.x -= distance
@@ -216,6 +225,7 @@ def mainMenu():
         pygame.display.update()
 
 def playButton():
+    background_music.play(99999)
     global SCREEN_BOTTOM, PADDLE_MOVE_SPEED, player1Y, player2Y
     TPS = 100
     delay = int(1000 / TPS)
