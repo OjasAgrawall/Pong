@@ -5,6 +5,7 @@ pygame.mixer.init()
 
 ball_bounce = pygame.mixer.Sound("18786.mp3")
 background_music = pygame.mixer.Sound("BackgroundMusic.mp3")
+menu_music = pygame.mixer.Sound("MenuMusic.mp3")
 
 
 TEMP_SCREEN_WIDTH = 800
@@ -189,6 +190,8 @@ def mainMenu():
     run = True
     global playButtonPressed, bg
     playButtonPressed = False
+    menu_music.play(99999)
+
     while run:
 
         screen.fill(WHITE)
@@ -214,17 +217,16 @@ def mainMenu():
 
         if play_button.clicked():
             playButtonPressed = True
+            run = False
         if exit_button.clicked():
             run = False
-
-        if playButtonPressed:
-            run = False
-        
+         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
         
         pygame.display.update()
+    menu_music.stop()
 
 def playButton():
     background_music.play(99999)
